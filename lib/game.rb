@@ -1,5 +1,3 @@
-require 'pry-byebug'
-
 class Game
   MAX_TURNS = 9
   MIN_TURNS = 5
