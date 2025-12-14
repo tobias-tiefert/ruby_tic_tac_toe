@@ -1,6 +1,5 @@
 class Game
   MAX_TURNS = 9
-  MIN_TURNS = 5
   def initialize
     @board = %w[1 2 3 4 5 6 7 8 9]
     @choices = %w[1 2 3 4 5 6 7 8 9]
@@ -32,11 +31,11 @@ class Game
   end
 
   def draw_board
-    puts ' '
+    puts '-----------------------'
     puts " #{@board[0]} | #{@board[1]} | #{@board[2]} "
-    puts '-----------'
+    puts '---+---+---'
     puts " #{@board[3]} | #{@board[4]} | #{@board[5]} "
-    puts '-----------'
+    puts '---+---+---'
     puts " #{@board[6]} | #{@board[7]} | #{@board[8]} "
     puts ' '
   end
@@ -50,6 +49,7 @@ class Game
   end
 
   def get_player_choice
+    puts '-----------------------'
     puts "#{@current_player.name} make your choice (#{@current_player.sign})"
     draw_board
     loop do
@@ -73,9 +73,10 @@ class Game
     @winning_options.each do |option|
       next unless option.all? { |element| @current_player.choices.include?(element) }
 
-      puts '-----------------------'
-      puts "#{@current_player.name.upcase} WITH #{@current_player.sign} WINS!!!!!!!"
       draw_board
+      puts '-----------------------'
+      puts "#{@current_player.name.upcase} (#{@current_player.sign}) WINS!!!!!!!"
+
       @winner = @current_player
     end
   end
