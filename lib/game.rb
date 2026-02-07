@@ -4,7 +4,12 @@ class Game
     @board = %w[1 2 3 4 5 6 7 8 9]
     @choices = %w[1 2 3 4 5 6 7 8 9]
     @winning_options = [%w[1 2 3], %w[4 5 6], %w[7 8 9], %w[1 4 7], %w[2 5 8], %w[3 6 9], %w[1 5 9], %w[3 5 7]]
-    start_game
+  end
+
+  def start_game
+    set_up_game
+    draw_start_message
+    play_game
   end
 
   def play_game
@@ -29,10 +34,8 @@ class Game
   def player_choice
     loop do
       this_choice = gets.chomp
-      if @choices.include?(this_choice)
-        update_choices(this_choice, @current_player)
-        break
-      end
+      return this_choice if @choices.include?(this_choice)
+
       puts 'Please choose one of the available choices on the board'
     end
   end
@@ -44,24 +47,21 @@ class Game
   end
 
   def check_result(player)
-    @winning_options.each do |option|
-      next unless option.all? { |element| player.choices.include?(element) }
+    return unless player_won?(player)
 
-      @winner = player
+    @winner = player
+  end
+
+  def player_won?(player)
+    @winning_options.each do |option|
+      return true if option.all? { |element| player.choices.include?(element) }
     end
+    false
   end
 
   def prepare_new_turn
     @turns += 1
     @current_player = @turns.even? ? @player1 : @player2
-  end
-
-  private
-
-  def start_game
-    set_up_game
-    draw_start_message
-    play_game
   end
 
   def set_up_game
@@ -71,6 +71,8 @@ class Game
     @turns = 0
     @winner = nil
   end
+
+  private
 
   def draw_start_message
     puts ' '
@@ -91,7 +93,7 @@ class Game
 
   def take_turns
     display_promt
-    player_choice
+    update_choices(player_choice, @current_player)
     check_result(@current_player)
     prepare_new_turn
   end
