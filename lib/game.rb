@@ -12,7 +12,7 @@ class Game
   def start_game
     set_up_game
     draw_start_message
-    take_turns
+    play_game
   end
 
   def set_up_game
@@ -40,26 +40,46 @@ class Game
     puts ' '
   end
 
+  def play_game
+    take_turns until game_over?
+    display_result
+  end
+
   def take_turns
-    until @winner
-      get_player_choice
-      check_result
-      prepare_new_turn
+    display_promt
+    player_choice
+    check_result(@current_player)
+    prepare_new_turn
+  end
+
+  def display_result
+    draw_board
+    if @winner.nil?
+      puts "It's a draw - The Game is over"
+    else
+      puts '-----------------------'
+      puts "#{@winner.name.upcase} (#{@winner.sign}) WINS!!!!!!!"
     end
   end
 
-  def get_player_choice
+  def game_over?
+    @winner.nil? && @turns < MAX_TURNS ? false : true
+  end
+
+  def display_promt
     puts '-----------------------'
     puts "#{@current_player.name} make your choice (#{@current_player.sign})"
     draw_board
+  end
+
+  def player_choice
     loop do
       this_choice = gets.chomp
-      if @choices.include?(this_choice) && this_choice != @player1.sign && this_choice != @player2.sign
+      if @choices.include?(this_choice)
         update_choices(this_choice)
         break
-      else
-        puts 'Please choose one of the available choices on the board'
       end
+      puts 'Please choose one of the available choices on the board'
     end
   end
 
@@ -69,30 +89,16 @@ class Game
     @current_player.add_choice(choice)
   end
 
-  def check_result
+  def check_result(player)
     @winning_options.each do |option|
-      next unless option.all? { |element| @current_player.choices.include?(element) }
+      next unless option.all? { |element| player.choices.include?(element) }
 
-      draw_board
-      puts '-----------------------'
-      puts "#{@current_player.name.upcase} (#{@current_player.sign}) WINS!!!!!!!"
-
-      @winner = @current_player
+      @winner = player
     end
   end
 
   def prepare_new_turn
     @turns += 1
-    if @turns == MAX_TURNS
-      draw_board
-      puts "It's a draw - The Game is over"
-      @winner = "It's a draw"
-    else
-      @current_player = if @current_player == @player1
-                          @player2
-                        else
-                          @player1
-                        end
-    end
+    @current_player = @turns.even? ? @player1 : @player2
   end
 end
