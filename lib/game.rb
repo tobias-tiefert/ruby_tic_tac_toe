@@ -7,6 +7,55 @@ class Game
     start_game
   end
 
+  def play_game
+    take_turns until game_over?
+    display_result
+  end
+
+  def display_result
+    draw_board
+    if @winner.nil?
+      puts "It's a draw - The Game is over"
+    else
+      puts '-----------------------'
+      puts "#{@winner.name.upcase} (#{@winner.sign}) WINS!!!!!!!"
+    end
+  end
+
+  def game_over?
+    @winner.nil? && @turns < MAX_TURNS ? false : true
+  end
+
+  def player_choice
+    loop do
+      this_choice = gets.chomp
+      if @choices.include?(this_choice)
+        update_choices(this_choice, @current_player)
+        break
+      end
+      puts 'Please choose one of the available choices on the board'
+    end
+  end
+
+  def update_choices(choice, player)
+    @board[choice.to_i - 1] = player.sign
+    @choices -= [choice]
+    player.add_choice(choice)
+  end
+
+  def check_result(player)
+    @winning_options.each do |option|
+      next unless option.all? { |element| player.choices.include?(element) }
+
+      @winner = player
+    end
+  end
+
+  def prepare_new_turn
+    @turns += 1
+    @current_player = @turns.even? ? @player1 : @player2
+  end
+
   private
 
   def start_game
@@ -40,11 +89,6 @@ class Game
     puts ' '
   end
 
-  def play_game
-    take_turns until game_over?
-    display_result
-  end
-
   def take_turns
     display_promt
     player_choice
@@ -52,53 +96,9 @@ class Game
     prepare_new_turn
   end
 
-  def display_result
-    draw_board
-    if @winner.nil?
-      puts "It's a draw - The Game is over"
-    else
-      puts '-----------------------'
-      puts "#{@winner.name.upcase} (#{@winner.sign}) WINS!!!!!!!"
-    end
-  end
-
-  def game_over?
-    @winner.nil? && @turns < MAX_TURNS ? false : true
-  end
-
   def display_promt
     puts '-----------------------'
     puts "#{@current_player.name} make your choice (#{@current_player.sign})"
     draw_board
-  end
-
-  def player_choice
-    loop do
-      this_choice = gets.chomp
-      if @choices.include?(this_choice)
-        update_choices(this_choice)
-        break
-      end
-      puts 'Please choose one of the available choices on the board'
-    end
-  end
-
-  def update_choices(choice)
-    @board[choice.to_i - 1] = @current_player.sign
-    @choices -= [choice]
-    @current_player.add_choice(choice)
-  end
-
-  def check_result(player)
-    @winning_options.each do |option|
-      next unless option.all? { |element| player.choices.include?(element) }
-
-      @winner = player
-    end
-  end
-
-  def prepare_new_turn
-    @turns += 1
-    @current_player = @turns.even? ? @player1 : @player2
   end
 end
